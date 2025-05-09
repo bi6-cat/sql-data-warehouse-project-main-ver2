@@ -41,7 +41,7 @@ BEGIN
 		INSERT INTO bronze.Patients (
 			patient_id, name, gender, dob, address, phone, email
 		)
-		SELECT id, address, dob, email, gender, name, phone
+		SELECT id, name, gender, dob, address, phone,email
 		FROM hms_hqt.dbo.patient
 		SET @end_time = GETDATE();
 		PRINT '>> Load Duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds';

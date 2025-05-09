@@ -1,4 +1,4 @@
-USE DataWarehouse 
+﻿USE DataWarehouse 
 GO
 
 /*
@@ -18,15 +18,12 @@ IF OBJECT_ID('bronze.Patients', 'U') IS NOT NULL
 GO
 CREATE TABLE bronze.Patients (
     patient_id INT ,
-    --first_name NVARCHAR(100),
-    --last_name NVARCHAR(100),
 	name NVARCHAR(100),
     gender NVARCHAR(10),
 	dob NVARCHAR(100),
     address NVARCHAR(MAX),
 	phone NVARCHAR(255),
 	email VARCHAR(100)
-    --date_registered DATETIME DEFAULT GETDATE()
 );
 GO
 
@@ -41,7 +38,6 @@ CREATE TABLE bronze.Doctors (
     specialization NVARCHAR(100),
     phone NVARCHAR(255),
 	email VARCHAR(225),
-    --date_joined DATETIME DEFAULT GETDATE()
 );
 GO
 
@@ -70,7 +66,7 @@ IF OBJECT_ID('bronze.VitalSigns', 'U') IS NOT NULL
     DROP TABLE bronze.VitalSigns;
 GO
 CREATE TABLE bronze.VitalSigns (
-    vital_id INT PRIMARY KEY,
+    vital_id INT,
     patient_id INT,
     measurement_date DATE,
     blood_pressure VARCHAR(10),         -- Ví dụ: '171/118'
@@ -91,7 +87,6 @@ CREATE TABLE bronze.Diseases (
     patient_id INT,
     disease_name NVARCHAR(255),
     diagnosis_date DATE,
-    --diagnosis_details NVARCHAR(MAX)
 );
 GO
 
@@ -114,7 +109,7 @@ IF OBJECT_ID('bronze.HospitalFees', 'U') IS NOT NULL
     DROP TABLE bronze.HospitalFees ;
 GO
 CREATE TABLE bronze.HospitalFees (
-      fee_id INT PRIMARY KEY,
+    fee_id INT PRIMARY KEY,
     appointment_id INT,
     patient_id INT,
     service_type NVARCHAR(100),
@@ -130,7 +125,7 @@ IF OBJECT_ID('bronze.Prescriptions', 'U') IS NOT NULL
     DROP TABLE bronze.Prescriptions ;
 GO
 CREATE TABLE bronze.Prescriptions (
-      prescription_id INT PRIMARY KEY,
+    prescription_id INT PRIMARY KEY,
     appointment_id INT,
     doctor_id INT,
     patient_id INT,
@@ -141,4 +136,21 @@ CREATE TABLE bronze.Prescriptions (
     duration_days INT,
     note NVARCHAR(255)
 );
+
+IF OBJECT_ID('bronze.LabResults', 'U') IS NOT NULL
+    DROP TABLE bronze.LabResults ;
+GO
+CREATE TABLE bronze.LabResults (
+    lab_result_id INT,
+	appointment_id INT,
+	patient_id INT,
+	test_type NVARCHAR(255),
+	parameter NVARCHAR(255),
+	value NVARCHAR(255),
+	unit NVARCHAR(255),
+	normal_range NVARCHAR(255),
+	interpretation NVARCHAR(255),
+	test_date DATE
+);
+
 GO

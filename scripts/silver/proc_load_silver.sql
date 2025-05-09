@@ -1,4 +1,4 @@
-/*
+﻿/*
 ===============================================================================
 Stored Procedure: Load Silver Layer (Bronze -> Silver)
 ===============================================================================
@@ -51,12 +51,18 @@ BEGIN
 					appointment_id,
 					patient_id,
 					doctor_id,
-					CASE 
-						WHEN start_time <> appointment_date THEN start_time
+					CASE
+						WHEN appointment_date IS NULL THEN 'n/a'
 						ELSE appointment_date
 					END AS appointment_date,
-					start_time,
-					end_time,
+					CASE
+						WHEN start_time IS NULL THEN 'n/a'
+						ELSE start_time
+					END AS start_time,
+					CASE
+						WHEN end_time IS NULL THEN 'n/a'
+						ELSE end_time
+					END AS end_time,
 					CASE
 						WHEN reason IS NUll THEN 'n/a'
 						ELSE TRIM(reason)
@@ -92,7 +98,10 @@ BEGIN
 				SELECT
 					disease_id,
 					patient_id,
-					disease_name,
+					CASE
+						WHEN disease_name IS NUll THEN 'Undiscovered disease'
+						ELSE disease_name
+					END AS disease_name,
 					CASE
 						WHEN diagnosis_date IS NUll THEN GETDATE()
 						ELSE diagnosis_date
@@ -120,24 +129,35 @@ BEGIN
 				SELECT 
 					doctor_id,
 					CASE	
+						WHEN name IS NULL THEN 'n/a'
 						WHEN LOWER(LEFT(TRIM(name), CHARINDEX(' ', TRIM(name))-1)) IN ('chị', 'anh', 'bà', 'ông', 'cô', 'chú') THEN TRIM(SUBSTRING(TRIM(name), CHARINDEX(' ', TRIM(name))+1, 100))
 						WHEN LOWER(LEFT(TRIM(name), CHARINDEX(' ', TRIM(name), CHARINDEX(' ', TRIM(name))+1))) IN ('quý ông', 'quý bà', 'quý cô') THEN TRIM(SUBSTRING(TRIM(name), CHARINDEX(' ', TRIM(name), CHARINDEX(' ', TRIM(name))+1)+1, 100))
 						ELSE TRIM(name)
 					END AS name,
-					last_name,
+					CASE
+						WHEN last_name IS NULL THEN 'n/a'
+						ELSE last_name
+					END AS last_name,
 					--CASE 
 					--	WHEN TRIM(LOWER(gender)) IN ('male', 'm') THEN 'Nam'
 					--	WHEN TRIM(LOWER(gender)) IN ('female', 'f') THEN 'Nữ'
 					--	WHEN TRIM(LOWER(gender)) IS NULL THEN 'n/a'
 					--	ELSE TRIM(gender)
 					--END AS gender,
-					specialization,
+					CASE
+						WHEN specialization IS NULL THEN 'n/a'
+						ELSE specialization
+					END AS specialization,
 					CASE 
 						WHEN SUBSTRING(phone, 1, 1) = '+' THEN '0' + REPLACE(REPLACE(SUBSTRING(TRIM(phone), 4, LEN(TRIM(phone))),'-',''), ' ', '')
 						WHEN SUBSTRING(phone, 1, 1) = '(' THEN REPLACE(REPLACE(REPLACE(REPLACE(TRIM(phone),'-',''), ' ', ''), '(', ''), ')', '')
 						ELSE REPLACE(REPLACE(TRIM(phone),'-',''), ' ', '')
 					END AS phone,
-					email
+					CASE
+						WHEN TRIM(email) IS NULL THEN 'n\a'
+						WHEN TRIM(email) LIKE '%[^a-zA-Z0-9@.]%' OR TRIM(email) NOT LIKE '%@%.%' THEN 'n/a'
+						ELSE TRIM(email)					
+					END AS email
 				FROM bronze.Doctors
 			SET @end_time = GETDATE();
 			PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
@@ -162,18 +182,30 @@ BEGIN
 				fee_id,
 				appointment_id,
 				patient_id,
-				TRIM(service_type),
-				TRIM(description),
-				ROUND(CAST(amount AS FLOAT), 0),
+				CASE
+					WHEN TRIM(service_type) IS NULL OR LEN(TRIM(service_type)) = 0THEN 'n/a'
+					ELSE TRIM(service_type)
+				END AS service_type,
+				CASE
+					WHEN TRIM(description) IS NULL OR LEN(TRIM(description)) = 0THEN 'n/a'
+					ELSE TRIM(description)
+				END AS description,
+				CASE 
+					WHEN amount IS NULL THEN 0
+					ELSE amount
+				END AS amount,
 				CASE 
 						WHEN SUBSTRING(phone, 1, 1) = '+' THEN '0' + REPLACE(REPLACE(SUBSTRING(TRIM(phone), 4, LEN(TRIM(phone))),'-',''), ' ', '')
 						WHEN SUBSTRING(phone, 1, 1) = '(' THEN REPLACE(REPLACE(REPLACE(REPLACE(TRIM(phone),'-',''), ' ', ''), '(', ''), ')', '')
 						ELSE REPLACE(REPLACE(TRIM(phone),'-',''), ' ', '')
 					END AS phone,
-				fee_date
+				CASE
+					WHEN fee_date IS NULL THEN 'n/a'
+					ELSE fee_date
+				END AS fee_date
 				FROM bronze.HospitalFees
 				ORDER BY fee_date ASC
-			SET @end_time = GETDATE();
+			SET @end_time = GETDATE()
 			PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
 			PRINT '>> --------';
 
@@ -199,8 +231,8 @@ BEGIN
 						ELSE TRIM(name)
 					END AS name,
 					CASE 
-						WHEN TRIM(LOWER(gender)) IN ('male', 'm') THEN 'Nam'
-						WHEN TRIM(LOWER(gender)) IN ('female', 'f') THEN 'Nữ'
+						WHEN TRIM(LOWER(gender)) IN ('male', 'm', 'nam') THEN 'Nam'
+						WHEN TRIM(LOWER(gender)) IN ('female', 'f', 'nữ', 'nu') THEN 'Nữ'
 						WHEN TRIM(LOWER(gender)) IS NULL THEN 'n/a'
 						ELSE TRIM(gender)
 					END AS gender,
@@ -211,7 +243,11 @@ BEGIN
 						WHEN SUBSTRING(phone, 1, 1) = '(' THEN REPLACE(REPLACE(REPLACE(REPLACE(TRIM(phone),'-',''), ' ', ''), '(', ''), ')', '')
 						ELSE REPLACE(REPLACE(TRIM(phone),'-',''), ' ', '')
 					END AS phone,
-					email
+					CASE
+						WHEN TRIM(email) IS NULL THEN 'n\a'
+						WHEN TRIM(email) LIKE '%[^a-zA-Z0-9@.]%' OR TRIM(email) NOT LIKE '%@%.%' THEN 'n/a'
+						ELSE TRIM(email)					
+					END AS email
 				FROM bronze.Patients
 				ORDER BY dob ASC
 			SET @end_time = GETDATE();
@@ -240,12 +276,30 @@ BEGIN
 					appointment_id,
 					doctor_id,
 					patient_id,
-					TRIM(medicine_name),
-					TRIM(form),
-					dosage_mg,
-					TRIM(instruction),
-					duration_days,
-					TRIM(note)
+					CASE
+						WHEN TRIM(medicine_name) IS NULL OR LEN(TRIM(medicine_name)) = 0 THEN 'n/a'
+						ELSE TRIM(medicine_name)
+					END AS medicine_name,
+					CASE
+						WHEN TRIM(form) IS NULL OR LEN(TRIM(form)) = 0 THEN 'n/a'
+						ELSE TRIM(form)
+					END AS form,
+					CASE
+						WHEN dosage_mg IS NULL THEN 'n/a'
+						ELSE dosage_mg
+					END AS dosage_mg,
+					CASE
+						WHEN TRIM(instruction) IS NULL OR LEN(TRIM(instruction)) = 0 THEN 'n/a'
+						ELSE TRIM(instruction)
+					END AS instruction,
+					CASE
+						WHEN duration_days IS NULL THEN 0
+						ELSE duration_days
+					END AS duration_days,
+					CASE
+						WHEN TRIM(note) IS NULL OR LEN(TRIM(note)) = 0 THEN 'n/a'
+						ELSE TRIM(note)
+					END AS note
 				FROM bronze.Prescriptions
 			SET @end_time = GETDATE();
 			PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
@@ -273,7 +327,10 @@ BEGIN
 						WHEN TRIM(treatment_description) IS NULL THEN 'n/a'
 						ELSE TRIM(treatment_description)
 					END AS treatment_description,
-					treatment_date
+					CASE
+						WHEN treatment_date IS NULL THEN 'n/a'
+						ELSE treatment_date
+					END AS treatment_date
 				FROM bronze.Treatments
 				ORDER BY treatment_date DESC
 			SET @end_time = GETDATE();

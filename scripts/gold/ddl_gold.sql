@@ -21,7 +21,6 @@ Usage:
 IF OBJECT_ID('gold.dim_patients', 'V') IS NOT NULL
     DROP VIEW gold.dim_patients;
 GO
-
 CREATE VIEW gold.dim_patients AS
 SELECT
     ROW_NUMBER() OVER (ORDER BY p.dwh_create_date) AS patient_key, -- Surrogate key
@@ -58,7 +57,7 @@ GO
 --select * from gold.dim_doctors
 
 -- ========================================================================================
--- Create Dimension And Fact: silver.Diseases t√°ch th√†nh gold.dim_diseases, gold.fact_diagnois
+-- Create Dimension And Fact: silver.Diseases t·ch th‡nh gold.dim_diseases, gold.fact_diagnois
 -- ========================================================================================
 
 ----------------------------gold.dim_diseases---------------------------------------------
