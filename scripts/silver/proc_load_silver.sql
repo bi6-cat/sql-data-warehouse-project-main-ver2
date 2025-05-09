@@ -374,28 +374,28 @@ BEGIN
 						ELSE TRIM(blood_pressure)
 					END AS blood_pressure,
 					CASE
-						WHEN heart_rate IS NULL THEN '-1'
-						WHEN heart_rate < 50 OR heart_rate > 120 THEN '-1'
+						WHEN heart_rate IS NULL THEN 70
+						WHEN heart_rate < 50 OR heart_rate > 120 THEN 70
 						ELSE heart_rate
 					END AS heart_rate,
 					CASE
-						WHEN respiratory_rate IS NULL THEN '-1'
-						WHEN respiratory_rate < 10 OR respiratory_rate > 30 THEN '-1'
+						WHEN respiratory_rate IS NULL THEN 20
+						WHEN respiratory_rate < 10 OR respiratory_rate > 30 THEN 20
 						ELSE respiratory_rate
 					END AS respiratory_rate,
 					CASE
-						WHEN temperature IS NULL THEN '-1'
-						WHEN temperature < 30 OR temperature > 43 THEN '-1'
+						WHEN temperature IS NULL THEN 37
+						WHEN temperature < 30 OR temperature > 43 THEN 37
 						ELSE temperature
 					END AS temperature,
 					CASE
-						WHEN oxygen_saturation IS NULL THEN '-1'
-						WHEN oxygen_saturation < 85 OR oxygen_saturation > 105 THEN '-1'
+						WHEN oxygen_saturation IS NULL THEN 95
+						WHEN oxygen_saturation < 85 OR oxygen_saturation > 105 THEN 95
 						ELSE oxygen_saturation
 					END AS oxygen_saturation,
 					CASE
-						WHEN blood_sugar IS NULL THEN 'n/a'
-						WHEN blood_sugar < 65 OR blood_sugar > 255 THEN '-1'
+						WHEN blood_sugar IS NULL THEN 175
+						WHEN blood_sugar < 65 OR blood_sugar > 255 THEN 160
 						ELSE blood_sugar
 					END AS blood_sugar
 				FROM bronze.VitalSigns
